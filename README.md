@@ -1,6 +1,6 @@
-<h1 align="center">SGSITS Student Portal (openSIS based)</h1>
+<h1 align="center">SGSITS Student Portal</h1>
 <p align="center">
-Modernized deployment-ready instance of an <strong>openSIS</strong>-derived Student Information System (SIS) adapted for the SGSITS student portal context.
+Modernized deployment-ready for the SGSITS student portal context.
 </p>
 
 ## Overview
@@ -56,16 +56,6 @@ Dockerfile             Container build definition
 5. APIs supply structured JSON outputs using direct SQL queries while reusing global configuration.
 6. The health endpoint performs a minimal READ query to validate database connectivity.
 
-## Environment Variables
-| Variable | Purpose |
-|----------|---------|
-| `DB_HOST` | Database host (MySQL) |
-| `DB_PORT` | Database port (defaults to 3306) |
-| `DB_NAME` | Database/schema name |
-| `DB_USER` | Database username |
-| `DB_PASS` | Database password |
-| `OPEN_SIS_TITLE` | Portal display title override |
-| `OPEN_SIS_NOTIFY` | Notification / error report email (optional) |
 
 An example template is provided in `.env.example` (no real secrets committed).
 
