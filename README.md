@@ -1,28 +1,123 @@
-# openSIS (student)
+<h1 align="center">SGSITS Student Portal (openSIS based)</h1>
+<p align="center">
+Modernized deployment-ready instance of an <strong>openSIS</strong>-derived Student Information System (SIS) adapted for the SGSITS student portal context.
+</p>
 
-This is a PHP openSIS instance prepared for deployment.
+## Overview
+This project is a PHP/MySQL student information system providing administrative, academic, and reporting functionality for institutions. It includes modules for school setup, student management, scheduling, grades, attendance, eligibility, discipline, billing, messaging, and utilities. The codebase has been adjusted to support containerized & cloud deployment (e.g. Render) using environment variables rather than hard‑coded credentials.
 
-What I changed to make this repo deployable:
-- Added `Data.php` to read DB and app settings from environment variables.
-- Added `.gitignore` and `.env.example` to avoid committing secrets.
-- Added a simple `Dockerfile` to run on Render or locally.
+## Core Features
+- Student demographics, enrollment & reenrollment workflows
+- Course catalog, sections, marking periods & scheduling tools
+- Attendance tracking with validation helpers
+- Grade reporting & GPA calculations
+- Discipline, eligibility, and billing modules (extensible)
+- Custom fields for users, staff, and schools
+- Bulk operations (mass schedule, rollover utilities, data import/export)
+- Role & profile driven access control
+- API endpoints (`api/SchoolInfo.php`, `api/StaffInfo.php`, `api/StudentEnrollmentInfo.php`)
+- Health status endpoint (`health.php`) for platform monitoring
+- Rollover & backup scripts for year transitions
+- Modular UI includes (Top, Side, Bottom, Menus) and dynamic modal components
 
-Local development
-1. Copy `.env.example` to `.env` and set credentials.
-2. Serve with PHP built-in server for quick tests:
+## Recent Enhancements (Deployment Readiness)
+- Environment-driven configuration (`Data.php` sources DB and app settings via env vars)
+- Added `Dockerfile` suitable for container hosting
+- Added `render.yaml` (infrastructure hint for Render Web Service)
+- Centralized database port handling across all runtime connections
+- Removed a hard-coded external logging connection for security hardening
+- Added `health.php` JSON endpoint for uptime checks
+- Expanded `.gitignore` to prevent accidental leakage of secrets and transient data
 
-   php -S 0.0.0.0:8080 -t .
+## Directory Structure (Selected)
+```
+assets/                Static images, icons, UI media
+api/                   Public API endpoints (JSON-oriented)
+modules/               Functional modules (schoolsetup, students, users, tools, etc.)
+functions/             Reusable function libraries (DB helpers, validation, formatting)
+install/               Installation & upgrade scripts (legacy, retain only if needed)
+js/                    JavaScript assets and plugins
+lang/                  Localization resources (labels, translations)
+libraries/             Third-party or shared PHP libraries
+health.php             Lightweight health/status probe
+ConfigInc.php          Core bootstrap loading DB + app metadata
+DatabaseInc.php        DB abstraction & query helpers
+ConnectionClass.php    Connection wrapper class (mysqli)
+Data.php               Environment variable orchestration (runtime configuration)
+render.yaml            Render service definition (optional infrastructure metadata)
+Dockerfile             Container build definition
+```
 
-Deploying to Render
-1. Create a new Web Service on Render.
-2. Connect your GitHub repository.
-3. Set environment variables (DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS) in the Render dashboard. Use a managed database or external provider.
-4. Use the provided `Dockerfile` or set the build and start commands to use PHP.
+## Runtime Architecture (High-Level)
+1. `ConfigInc.php` loads `Data.php` (env values) then initializes DB + version metadata from the `app` table.
+2. `DatabaseInc.php` supplies query helpers (`DBQuery`, `db_start`, etc.).
+3. Session and module resolution flows through `Modules.php`, including security checks & dynamic module includes.
+4. Each module encapsulates its UI, forms, and process scripts (procedural style).
+5. APIs supply structured JSON outputs using direct SQL queries while reusing global configuration.
+6. The health endpoint performs a minimal READ query to validate database connectivity.
 
-Notes
-- Database credentials must be provided by the platform; the app will read them from environment variables.
-- I avoided changing application code paths; most DB calls use the global variables defined in `Data.php`.
+## Environment Variables
+| Variable | Purpose |
+|----------|---------|
+| `DB_HOST` | Database host (MySQL) |
+| `DB_PORT` | Database port (defaults to 3306) |
+| `DB_NAME` | Database/schema name |
+| `DB_USER` | Database username |
+| `DB_PASS` | Database password |
+| `OPEN_SIS_TITLE` | Portal display title override |
+| `OPEN_SIS_NOTIFY` | Notification / error report email (optional) |
 
-Next steps I can take for you
-- Replace any remaining hard-coded DB connection attempts in files that bypass `DatabaseInc.php` to use the globals (I can scan and fix).
-- Add a small health-check endpoint and a `render.yaml` config if you want to use Render's native settings.
+An example template is provided in `.env.example` (no real secrets committed).
+
+## Security & Hardening Notes
+- **Secrets**: All credentials sourced from environment variables; no secrets stored in VCS.
+- **Installer**: The `install/` directory contains legacy provisioning & upgrade scripts. Remove or restrict it in production once the system is initialized.
+- **Health Endpoint**: `health.php` currently open; optionally add a token or IP allowlist if required.
+- **Error Handling**: `db_show_error` can expose stack traces. Consider disabling verbose output or gating behind an environment flag in production.
+- **Legacy Code**: Some legacy procedural patterns and commented `mysql_*` references remain (non-executing). Refactoring opportunity for future modernization.
+- **Uploads**: If enabling user/student photo or file uploads, ensure those directories are protected from arbitrary script execution (e.g. disable PHP in upload paths at web server level).
+
+## API Summary (Selected)
+- `api/SchoolInfo.php`: School meta & structural data
+- `api/StaffInfo.php`: Staff directory & roles
+- `api/StudentEnrollmentInfo.php`: Enrollment listings & status
+All rely on global DB connection; rate limiting / auth is advised before public exposure.
+
+## Logging & Auditing
+The system provides basic logging through DB write operations and (optionally) email notifications for certain errors or violation attempts. Centralized structured logging could be introduced (future enhancement) using middleware or a PSR-3 compatible logger.
+
+## Internationalization
+Language resources live under `lang/`. Extending translation coverage involves adding or updating label arrays and ensuring UI echoes translation keys consistently.
+
+## Extensibility
+Modules can be added by creating a directory under `modules/` with the appropriate entry point and including it via navigation or direct `modname` dispatch. Shared helpers should live in `functions/` to avoid duplication.
+
+## Roadmap (Suggested Future Work)
+- Introduce Composer autoloading & dependency management
+- Replace procedural DB wrappers with PDO + prepared statements
+- Add automated test coverage (PHPUnit) for critical logic (GPA calc, enrollment transitions)
+- Implement a lightweight ORM or query builder for safety
+- Migrate inline HTML/PHP mixes toward a template system (Twig / Blade)
+- Add role-based API authentication (JWT or session tokens)
+- Harden health & API endpoints (rate limiting, structured error responses)
+- Implement CI (lint, security scan, container build) via GitHub Actions
+- Normalize date/time handling with UTC storage & configurable display timezones
+- Remove or archive legacy install scripts after stable migrations are scripted
+
+## Contributing
+1. Follow clear commit messages (Conventional Commits style recommended).
+2. Keep security in mind—never commit secrets or production dumps.
+3. Prefer small, focused pull requests per feature or fix.
+4. Include a brief rationale in PR descriptions—especially for schema changes.
+
+## License
+This project inherits the original openSIS GPLv2 license headers present in source files. See `license.txt` (or original upstream licensing) for full terms. All modifications herein are provided under the same GPLv2 license.
+
+## Attribution
+Based on openSIS (Open Solutions for Education, Inc.). Enhancements & deployment adjustments tailored for SGSITS portal usage.
+
+## Status Badge (Manual)
+Add CI or deployment status badges here when pipelines are introduced.
+
+---
+This README focuses on architecture, capabilities, and operational context while intentionally omitting step-by-step setup instructions.
