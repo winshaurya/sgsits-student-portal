@@ -35,22 +35,43 @@ function db_start()
     $connection = new ConnectDBOpensis();
     switch ($DatabaseType) {
         case 'mysqli':
-
+            // Fail fast if mandatory parts missing
+            if (empty($DatabaseServer) || empty($DatabaseName) || empty($DatabaseUsername)) {
+                if (getenv('DEBUG') === '1') {
+                    echo "<h2>Database configuration incomplete</h2>";
+                    echo "<p>One or more required environment variables are missing:</p>";
+                    echo "<pre>DB_HOST={$DatabaseServer}\nDB_NAME={$DatabaseName}\nDB_USER={$DatabaseUsername}</pre>";
+                }
+                return null;
+            }
             if ($connection->auto_init == true) {
-                $connection = $connection->init($DatabaseServer, $DatabaseUsername, $DatabasePassword, $DatabaseName, $DatabasePort);
-                mysqli_set_charset($connection, "utf8");
+                $tmp = $connection->init($DatabaseServer, $DatabaseUsername, $DatabasePassword, $DatabaseName, $DatabasePort);
+                if ($tmp instanceof mysqli && $tmp->connect_errno) {
+                    if (getenv('DEBUG') === '1') {
+                        echo "<h2>Database connection failed</h2>";
+                        echo "<p>Error (" . $tmp->connect_errno . "): " . htmlspecialchars($tmp->connect_error) . "</p>";
+                        echo "<p>Check that your Render service has the correct environment variables (DB_HOST / DB_PORT / DB_NAME / DB_USER / DB_PASS or DB_URL).</p>";
+                    }
+                    return null;
+                }
+                if ($tmp) {
+                    $connection = $tmp;
+                    @mysqli_set_charset($connection, "utf8");
+                }
             }
             break;
     }
 
     // Error code for both.
-    if ($connection === false) {
+    if ($connection === false || $connection === null) {
         switch ($DatabaseType) {
             case 'mysqli':
-                $errormessage = $connection->error;
+                $errormessage = (is_object($connection) ? $connection->error : 'NULL CONNECTION');
                 break;
         }
-        db_show_error("", "" . _couldNotConnectToDatabase . ": $DatabaseServer", $errormessage);
+        if (getenv('DEBUG') === '1') {
+            db_show_error("", "" . _couldNotConnectToDatabase . ": $DatabaseServer", $errormessage);
+        }
     }
     return $connection;
 }
