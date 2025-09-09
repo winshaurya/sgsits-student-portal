@@ -118,28 +118,18 @@ function DBQuery($sql)
 
                 foreach ($array as $value) {
                     if ($value != "") {
-                        $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                        if ($user_agent[0] == 'Mozilla') {
-                            $result = $connection->query($value);
-                        }
+                        $result = $connection->query($value);
                         if (!$result) {
-                            $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                            if ($user_agent[0] == 'Mozilla') {
-                                $connection->query("ROLLBACK");
-                                die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
-                            }
+                            $connection->query("ROLLBACK");
+                            die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
                         }
                     }
                 }
             } else {
-                $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                if ($user_agent[0] == 'Mozilla') {
-                    // $result = $connection->query($sql) or die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
-                    try {
-                        $result = $connection->query($sql);
-                    } catch (Exception $e) {
-                        die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
-                    }
+                try {
+                    $result = $connection->query($sql);
+                } catch (Exception $e) {
+                    die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
                 }
             }
             break;
@@ -173,24 +163,15 @@ function DBQuery_assignment($sql)
                 $array = explode(";", $sql);
                 foreach ($array as $value) {
                     if ($value != "") {
-                        $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                        if ($user_agent[0] == 'Mozilla') {
-                            $result = $connection->query($value);
-                        }
+                        $result = $connection->query($value);
                         if (!$result) {
-                            $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                            if ($user_agent[0] == 'Mozilla') {
-                                $connection->query("ROLLBACK");
-                                die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
-                            }
+                            $connection->query("ROLLBACK");
+                            die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
                         }
                     }
                 }
             } else {
-                $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                if ($user_agent[0] == 'Mozilla') {
-                    $result = $connection->query($sql) or die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
-                }
+                $result = $connection->query($sql) or die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
             }
             break;
     }
@@ -220,25 +201,15 @@ function DBQueryMod($sql)
                 $array = explode(";", $sql);
                 foreach ($array as $value) {
                     if ($value != "") {
-                        $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                        if ($user_agent[0] == 'Mozilla') {
-                            $result = $connection->query($value);
-                        }
-
+                        $result = $connection->query($value);
                         if (!$result) {
-                            $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                            if ($user_agent[0] == 'Mozilla') {
-                                $connection->query("ROLLBACK");
-                                die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
-                            }
+                            $connection->query("ROLLBACK");
+                            die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
                         }
                     }
                 }
             } else {
-                $user_agent = explode('/', $_SERVER['HTTP_USER_AGENT']);
-                if ($user_agent[0] == 'Mozilla') {
-                    $result = $connection->query($sql) or die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
-                }
+                $result = $connection->query($sql) or die(db_show_error($sql, _dbExecuteFailed, mysqli_error($connection)));
             }
             break;
     }

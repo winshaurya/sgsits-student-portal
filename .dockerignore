@@ -1,19 +1,19 @@
-# Exclude VCS, local, and unnecessary build context files
+# Build context exclusions
 .git
 .gitignore
+.env
+*.md
 Dockerfile
 render.yaml
-README.md
-*.md
 node_modules/
 vendor/
-# Logs & temp
 *.log
 /tmp
 .cache
-# Editors
 .vscode
 .idea
-# OS files
 .DS_Store
 Thumbs.db
+sessions/
+cache/
+install/backup/

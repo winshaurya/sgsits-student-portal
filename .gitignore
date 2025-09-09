@@ -1,6 +1,6 @@
-# Ignore environment files
+# Ignore environment file (keep example tracked)
 .env
-.env.local
+
 
 # Composer / vendor
 vendor/
