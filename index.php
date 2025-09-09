@@ -27,7 +27,14 @@
 #
 #***************************************************************************************
 //declare(strict_types=1);
-error_reporting(0);
+// Allow turning on debug output via environment variable DEBUG=1
+if (getenv('DEBUG') === '1') {
+    error_reporting(E_ALL);
+    ini_set('display_errors', '1');
+} else {
+    error_reporting(0);
+    ini_set('display_errors', '0');
+}
 
 ini_set('session.cookie_httponly', '1');
 ini_set('session.cookie_samesite', 'Strict');

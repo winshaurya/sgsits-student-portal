@@ -56,7 +56,10 @@ if (!defined('CONFIG_INC')) {
     $htmldocAssetsPath = '';        // way htmldoc accesses the assets/ directory, possibly different than user - empty string means no translation
     //    $StudentPicturesPath = 'assets/studentphotos/';
     //    $UserPicturesPath = 'assets/userphotos/';
-    $openSISTitle = "GS Student Portal";
+    // Preserve value from Data.php (env OPEN_SIS_TITLE) if set
+    if (!isset($openSISTitle) || $openSISTitle === '') {
+        $openSISTitle = "GS Student Portal"; // fallback default
+    }
     $openSISAdmins = '1';            // can be list such as '1,23,50' - note, these should be id's in the DefaultSyear, otherwise they can't login anyway
     $openSISNotifyAddress = '';
     $msgFlag = '';

@@ -5,11 +5,17 @@ services:
     plan: free
     healthCheckPath: /health.php
     dockerfilePath: ./Dockerfile
-  buildCommand: ""
-  startCommand: ""
+    buildCommand: ""
+    startCommand: ""
     autoDeploy: true
     envVars:
-      - key: DB_HOST
+      # Provide actual values for these in the Render Dashboard if sync:false
+      # You may supply either discrete vars (DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME)
+      # or a single MySQL URL in DB_HOST or DB_URL like:
+      # mysql://user:pass@host:port/database
+      - key: DB_HOST     # e.g. xyz.us-east-1.psdb.cloud
+        sync: false
+      - key: DB_URL      # optional single DSN style variable
         sync: false
       - key: DB_PORT
         value: 3306
@@ -19,5 +25,7 @@ services:
         sync: false
       - key: DB_PASS
         sync: false
+      - key: DEBUG       # Set to 1 temporarily to surface PHP errors (remember to remove later)
+        value: "1"
       - key: OPEN_SIS_TITLE
         value: GS Student Portal
