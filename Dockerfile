@@ -15,19 +15,34 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 # System packages & MariaDB (can be removed if using external DB only)
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-       mariadb-server mariadb-client \
-       gosu curl ca-certificates nano vim less git unzip \
-    && docker-php-ext-install mysqli pdo pdo_mysql \
-    && a2enmod rewrite headers expires \
-    && rm -rf /var/lib/apt/lists/*
+     && apt-get install -y --no-install-recommends \
+         mariadb-server mariadb-client \
+         gosu curl ca-certificates nano vim less git unzip \
+         libjpeg62-turbo-dev libpng-dev libfreetype6-dev \
+     && docker-php-ext-configure gd --with-jpeg --with-freetype \
+     && docker-php-ext-install mysqli pdo pdo_mysql exif bcmath gd \
+     && a2enmod rewrite headers expires \
+     && rm -rf /var/lib/apt/lists/*
 
 # Copy source
 WORKDIR /var/www/html
 COPY . /var/www/html
 
 # Ensure proper ownership (www-data for Apache)
-RUN chown -R www-data:www-data /var/www/html
+RUN chown -R www-data:www-data /var/www/html \
+ && { \
+     echo 'memory_limit=256M'; \
+     echo 'upload_max_filesize=32M'; \
+     echo 'post_max_size=32M'; \
+     echo 'max_execution_time=120'; \
+     echo 'expose_php=0'; \
+     echo 'log_errors=On'; \
+     echo 'error_log=/dev/stderr'; \
+     echo 'session.cookie_httponly=1'; \
+     echo 'opcache.validate_timestamps=1'; \
+     echo 'opcache.enable=1'; \
+     echo 'opcache.memory_consumption=128'; \
+ } > /usr/local/etc/php/conf.d/zz-app.ini
 
 # Tune Apache to use PORT (Render provides dynamic $PORT)
 RUN sed -ri 's/Listen 80/Listen ${PORT}/' /etc/apache2/ports.conf \
